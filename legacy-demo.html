@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Latur Municipal Corporation — Water Network Data & Distribution Portal</title>
+<style>
+:root{--side:#1d2329;--sideT:#c9d3dc;--acc:#3fa535;--accD:#2d7d26;--bg:#eef1f4;--surf:#fff;--text:#18222c;--mut:#5d6b78;--line:#d6dde4;--red:#c62828;--amb:#c77800;--blu:#1565c0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11171c;--surf:#1a2229;--text:#e5ecf2;--mut:#98a8b6;--line:#2a3640;--acc:#5cc24f;--red:#ef7d7d;--amb:#ffb74d;--blu:#64b5f6}}
+:root[data-theme="dark"]{--bg:#11171c;--surf:#1a2229;--text:#e5ecf2;--mut:#98a8b6;--line:#2a3640;--acc:#5cc24f;--red:#ef7d7d;--amb:#ffb74d;--blu:#64b5f6}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari","Mukta","Nirmala UI","Mangal",sans-serif;display:flex}
+aside{width:215px;background:var(--side);color:var(--sideT);display:flex;flex-direction:column;flex:none}
+.brand{padding:14px;border-bottom:1px solid #2f3942}.brand b{display:block;color:#fff;font-size:.95rem;line-height:1.25}.brand span{font-size:.72rem;color:#8fa0ae}
+aside nav{padding:8px;flex:1}
+aside nav button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--sideT);padding:9px 10px;border-radius:6px;cursor:pointer;font:inherit;border-left:3px solid transparent}
+aside nav button:hover{background:#28313a}aside nav button[aria-current=true]{background:#28313a;color:#fff;border-left-color:var(--acc)}
+.foot{padding:10px 14px;font-size:.72rem;color:#8fa0ae;border-top:1px solid #2f3942}
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{background:var(--surf);border-bottom:1px solid var(--line);padding:8px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.top h2{margin:0;font-size:1.05rem}.sp{flex:1}.clk{font-size:.8rem;color:var(--mut);font-variant-numeric:tabular-nums}
+select,input,textarea,button{font:inherit;color:var(--text)}
+select,input,textarea{background:var(--surf);border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:0}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:7px 14px;cursor:pointer;font-weight:600}
+:root[data-theme="dark"] .btn{color:#0c2a09}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0c2a09}}
+.btn.o{background:transparent;color:var(--text);border:1px solid var(--line);font-weight:500}.btn.s{padding:3px 9px;font-size:.78rem}.btn.r{background:var(--red)}
+.view{flex:1;overflow:auto;padding:16px;min-height:0}
+.note{background:rgba(199,120,0,.12);border:1px solid var(--amb);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.82rem;margin-bottom:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-bottom:16px}
+.card{background:var(--surf);border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:8px;padding:10px 12px}
+.card b{font-size:1.5rem;display:block;line-height:1.1}.card span{font-size:.76rem;color:var(--mut)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:900px){.g2{grid-template-columns:1fr}}
+.pn{background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:14px}.pn h3{margin:0 0 8px;font-size:.88rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.84rem}
+th,td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:.72rem;text-transform:uppercase;color:var(--mut)}
+.bd{display:inline-block;border:1px solid currentColor;border-radius:99px;padding:0 8px;font-size:.72rem;font-weight:600}
+.s-active{color:var(--acc)}.s-published,.s-approved{color:var(--blu)}.s-delayed,.s-paused,.s-submitted{color:var(--amb)}.s-cancelled,.s-interrupted{color:var(--red)}.s-draft,.s-completed{color:var(--mut)}
+.mapw{display:grid;grid-template-columns:1fr 250px;gap:12px;height:100%}@media(max-width:900px){.mapw{grid-template-columns:1fr;grid-template-rows:60vh auto}}
+.mp{position:relative;background:var(--surf);border:1px solid var(--line);border-radius:8px;overflow:hidden;min-height:300px}
+.mp svg{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.leg{position:absolute;left:8px;bottom:8px;background:var(--surf);border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:.72rem}
+.leg i{display:inline-block;width:14px;height:0;border-top:3px solid;margin-right:5px;vertical-align:middle}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:8px}.row label{font-size:.76rem;color:var(--mut);display:block}
+.msg{padding:8px 10px;border-radius:6px;font-size:.84rem;margin:8px 0;border:1px solid var(--line)}.msg.e{border-color:var(--red);color:var(--red)}.msg.k{border-color:var(--acc)}
+textarea{width:100%;height:160px;font:12px monospace}.n{font-size:.76rem;color:var(--mut)}.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:.84rem}.kv dt{color:var(--mut)}.kv dd{margin:0}
+.chk label{display:block;font-size:.84rem}
+@media(max-width:700px){aside{width:58px}.brand span,.brand b,.foot{display:none}aside nav button{padding:9px 4px;font-size:.62rem;text-align:center}}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.top .btn.s{min-width:84px}
+</style>
+</head>
+<body>
+<aside><div class="brand"><b>Latur Municipal Corporation</b><span>Water Network Portal</span></div>
+<nav id="nav"></nav><div class="foot">Logo placeholder · configurable<br>Maps: schematic, no basemap</div></aside>
+<main>
+<div class="top"><h2 id="title"></h2><span class="sp"></span><span class="clk" id="clk"></span>
+<label class="n">View as <select id="role"><option value="citizen">Citizen (public)</option><option value="op1">Operator Op-1</option><option value="op2">Operator Op-2</option><option value="officer" selected>Officer</option><option value="admin">Administrator</option></select></label>
+<button class="btn o s" id="lg" type="button">मराठी</button><button class="btn o s" id="th" type="button">Theme</button></div>
+<div class="view" id="view"></div>
+</main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const IST='Asia/Kolkata',TYPES=['ward','zone','pipeline','valve','tank','pump'];
+/* ---------- time (IST) ---------- */
+function now(){const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:IST,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));return{date:`${p.year}-${p.month}-${p.day}`,min:+p.hour*60+ +p.minute,t:`${p.hour}:${p.minute}`}}
+const tm=s=>{const[a,b]=s.split(':');return+a*60+ +b},addD=(d,n)=>{const x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
+/* ---------- demo data: abstract coordinates, NOT real Latur geometry ---------- */
+const sq=(x,y,w,h)=>[[[x,y],[x+w,y],[x+w,y+h],[x,y+h],[x,y]]];
+const F=(t,id,name,g,o={})=>({type:'Feature',properties:{type:t,id,name,verified:'demo',...o},geometry:g});
+const DEMO={demo:true,features:[
+ F('ward','W-D1','Demo Ward 1',{type:'Polygon',coordinates:sq(0,0,.012,.012)}),F('ward','W-D2','Demo Ward 2',{type:'Polygon',coordinates:sq(.012,0,.012,.012)}),
+ F('zone','Z-D1A','Demo Zone 1A',{type:'Polygon',coordinates:sq(.001,.001,.01,.005)},{ward:'W-D1'}),F('zone','Z-D1B','Demo Zone 1B',{type:'Polygon',coordinates:sq(.001,.006,.01,.005)},{ward:'W-D1'}),
+ F('zone','Z-D2A','Demo Zone 2A',{type:'Polygon',coordinates:sq(.013,.001,.01,.01)},{ward:'W-D2'}),
+ F('pipeline','PL-D1','Main A',{type:'LineString',coordinates:[[0,.006],[.012,.006],[.024,.006]]},{dia:400,material:'DI',zone:'Z-D1A'}),
+ F('pipeline','PL-D2','Branch 1A',{type:'LineString',coordinates:[[.006,.006],[.006,.0015]]},{dia:200,material:'PVC',zone:'Z-D1A'}),
+ F('pipeline','PL-D3','Branch 1B',{type:'LineString',coordinates:[[.006,.006],[.006,.0105]]},{dia:200,material:'PVC',zone:'Z-D1B'}),
+ F('pipeline','PL-D4','Branch 2A',{type:'LineString',coordinates:[[.018,.006],[.018,.0015]]},{dia:250,material:'DI',zone:'Z-D2A'}),
+ F('valve','V-D1','Valve 1A',{type:'Point',coordinates:[.006,.0045]},{zone:'Z-D1A',status:'operational'}),F('valve','V-D2','Valve 1B',{type:'Point',coordinates:[.006,.0075]},{zone:'Z-D1B',status:'operational'}),
+ F('valve','V-D3','Valve 2A',{type:'Point',coordinates:[.018,.0045]},{zone:'Z-D2A',status:'operational'}),F('valve','V-D4','Valve Main (shared)',{type:'Point',coordinates:[.012,.006]},{zone:'Z-D1A',status:'operational'}),
+ F('tank','T-D1','Demo Tank',{type:'Point',coordinates:[0,.006]},{capacity_kl:500}),F('pump','PS-D1','Demo Pumping Station',{type:'Point',coordinates:[.002,.0075]},{status:'operational'})]};
+const OPS=['Op-1','Op-2'];
+function seed(){const n=now(),h=Math.floor(n.min/60),z=x=>String(x%24).padStart(2,'0')+':00';
+ return[{id:'S-1',zone:'Z-D1A',date:n.date,start:z(Math.max(h-1,0)),end:z(Math.max(h-1,0)+3),op:'Op-1',valves:['V-D1','V-D4'],status:'published',log:[]},
+ {id:'S-2',zone:'Z-D2A',date:n.date,start:'23:00',end:'23:50',op:'Op-2',valves:['V-D3'],status:'published',log:[]},
+ {id:'S-3',zone:'Z-D1B',date:addD(n.date,1),start:'06:00',end:'08:00',op:'Op-1',valves:['V-D2','V-D4'],status:'approved',log:[]},
+ {id:'S-4',zone:'Z-D2A',date:addD(n.date,2),start:'06:00',end:'08:00',op:'Op-2',valves:['V-D3'],status:'draft',log:[]}]}
+/* ---------- state + persistence ---------- */
+const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let D=ld('lm_data',null),SCH=ld('lm_sch',null),LOG=ld('lm_log',[]),CFG=ld('lm_cfg',{window:true});
+if(!D||!Array.isArray(D.features))D=DEMO;if(!Array.isArray(SCH))SCH=seed();
+const save=()=>{sv('lm_data',D);sv('lm_sch',SCH);sv('lm_log',LOG.slice(-300));sv('lm_cfg',CFG)};
+const role=()=>$('#role').value,isOp=()=>role().startsWith('op'),me=()=>role()==='op1'?'Op-1':role()==='op2'?'Op-2':null,isOff=()=>['officer','admin'].includes(role());
+const P=f=>f.properties,byT=t=>D.features.filter(f=>P(f).type===t),feat=id=>D.features.find(f=>P(f).id===id);
+const audit=(a,id,d)=>{LOG.push({at:new Date().toISOString(),by:role(),a,id,d:d||''})};
+/* ---------- geometry ---------- */
+const hav=(a,b)=>{const R=6371000,r=Math.PI/180,dl=(b[1]-a[1])*r,dn=(b[0]-a[0])*r,x=Math.sin(dl/2)**2+Math.cos(a[1]*r)*Math.cos(b[1]*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
+const lenM=f=>f.geometry.coordinates.reduce((s,c,i,a)=>i?s+hav(a[i-1],c):0,0);
+function pts(g){return g.type==='Point'?[g.coordinates]:g.type==='LineString'?g.coordinates:g.coordinates.flat()}
+let B,VB;
+function bounds(){const a=D.features.flatMap(f=>pts(f.geometry));if(!a.length){B=null;return}const xs=a.map(c=>c[0]),ys=a.map(c=>c[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),w=x1-x0||1e-4,h=y1-y0||1e-4,k=Math.min(760/w,520/h);B={x0,y1,k};VB=[0,0,800,560]}
+const pr=c=>`${((c[0]-B.x0)*B.k+20).toFixed(1)},${((B.y1-c[1])*B.k+20).toFixed(1)}`;
+function validate(j){if(!j||j.type!=='FeatureCollection'||!Array.isArray(j.features)||!j.features.length)return'Must be a GeoJSON FeatureCollection with at least one feature.';const ids=new Set();
+ for(const f of j.features){const p=f?.properties,g=f?.geometry;if(!p||!TYPES.includes(p.type))return`Each feature needs properties.type in: ${TYPES.join(', ')}.`;if(!p.id||ids.has(p.id))return`Missing or duplicate id: ${p?.id}`;ids.add(p.id);
+ const ok={ward:'Polygon',zone:'Polygon',pipeline:'LineString',valve:'Point',tank:'Point',pump:'Point'}[p.type];if(g?.type!==ok)return`${p.id}: ${p.type} must be a ${ok}.`;
+ if(!pts(g).every(c=>Array.isArray(c)&&c.length>=2&&isFinite(c[0])&&isFinite(c[1])))return`${p.id}: invalid coordinates.`;
+ if(g.type==='Polygon'&&(g.coordinates.length<1||g.coordinates[0].length<4))return`${p.id}: polygon ring needs at least 4 points.`}return null}
+/* ---------- schedule logic ---------- */
+function eff(s){if(s.status==='published'){const n=now();if(s.date<n.date||(s.date===n.date&&n.min>tm(s.start)+15))return'delayed'}return s.status}
+const key=s=>s.date+s.start,sbadge=s=>{const e=eff(s);return`<span class="bd s-${e}">${e[0].toUpperCase()+e.slice(1)}</span>`};
+function conflicts(c,ignore){const out=[];for(const s of SCH){if(s.id===ignore||['cancelled','completed','draft'].includes(s.status)||s.date!==c.date)continue;if(!(c.start<s.end&&s.start<c.end))continue;
+ if(s.op===c.op)out.push(`${s.id}: operator ${c.op} already assigned ${s.start}–${s.end}`);const sh=s.valves.filter(v=>c.valves.includes(v));if(sh.length)out.push(`${s.id}: shared valve ${sh.join(', ')} used ${s.start}–${s.end}`)}return out}
+function act(id,a,reason){const s=SCH.find(x=>x.id===id);if(!s)return'Not found';const n=now(),R=(reason||'').trim(),T=(st,m)=>{s.status=st;s.log.push({at:n.date+' '+n.t,by:me()||role(),a,reason:R});audit('schedule.'+a,id,R);save();return m};
+ const need=()=>R?null:'A reason is required for this action.';
+ if(a==='submit'&&s.status==='draft'&&isOff()){const c=conflicts(s,s.id);if(c.length)return'Conflict: '+c.join('; ');return T('submitted')}
+ if(a==='approve'&&s.status==='submitted'&&isOff())return T('approved');
+ if(a==='reject'&&s.status==='submitted'&&isOff())return need()||T('draft');
+ if(a==='publish'&&s.status==='approved'&&isOff()){const c=conflicts(s,s.id);return c.length?'Conflict: '+c.join('; '):T('published')}
+ if(a==='cancel'&&['draft','submitted','approved','published'].includes(s.status)&&isOff())return need()||T('cancelled');
+ if(a==='start'&&s.status==='published'&&isOp()&&s.op===me()){
+  if(CFG.window&&(s.date!==n.date||n.min<tm(s.start)-30||n.min>tm(s.end)))return'Outside the permitted operating window (30 min before start until planned end, same day).';
+  const other=SCH.find(x=>x.id!==s.id&&x.status==='active'&&x.valves.some(v=>s.valves.includes(v)));if(other)return`Blocked: valve in use by active session ${other.id}.`;
+  s.actualStart=n.date+' '+n.t;return T('active')}
+ if(a==='pause'&&s.status==='active'&&isOp()&&s.op===me())return T('paused');
+ if(a==='resume'&&s.status==='paused'&&isOp()&&s.op===me())return T('active');
+ if(a==='stop'&&['active','paused'].includes(s.status)&&isOp()&&s.op===me()){const early=n.date<s.date||(n.date===s.date&&n.min<tm(s.end));if(early&&need())return'Stopping before the planned end requires a reason.';s.actualEnd=n.date+' '+n.t;return T(early?'interrupted':'completed')}
+ return'Action not allowed for your role or the current status.'}
+/* ---------- UI ---------- */
+const NAV=[['dash','Dashboard'],['map','GIS Map'],['assets','Assets'],['sched','Schedules'],['pub','Public View'],['data','Data & Audit']];
+let cur='dash',selId=null,vis={ward:1,zone:1,pipeline:1,valve:1,tank:1,pump:1},vf='all',flash='';
+$('#nav').innerHTML=NAV.map(n=>`<button data-v="${n[0]}">${n[1]}</button>`).join('');
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{cur=b.dataset.v;flash='';render()});
+$('#role').onchange=()=>{if(role()==='citizen')cur='pub';render()};
+setInterval(()=>{const n=now();$('#clk').textContent=n.date+' '+n.t+' IST'},1000);
+const demoNote=()=>D.demo?'<div class="note"><b>Demonstration data.</b> <span>These assets use abstract coordinates and are not real Latur boundaries, pipelines or valves. Import approved GeoJSON in the Data &amp; Audit section.</span></div>':'';
+const ctrlNote='<div class="note">Role switching here is a preview of workspaces only — it is not security. Real authentication and server-side permissions require the backend. Data is stored in this browser only.</div>';
+const vtag=f=>{const v=P(f).verified;return`<span class="bd ${v==='verified'?'s-active':v==='demo'?'s-delayed':'s-draft'}">${esc(v||'draft')}</span>`};
+function zn(id){return P(feat(id)||{properties:{}}).name||id}
+function table(rows,cols,empty){return rows.length?`<div class="tw"><table><tr>${cols.map(c=>`<th>${c[0]}</th>`).join('')}</tr>${rows.map(r=>`<tr>${cols.map(c=>`<td>${c[1](r)}</td>`).join('')}</tr>`).join('')}</table></div>`:`<p class="n">${empty||'No records.'}</p>`}
+const sRows=[['Zone',s=>esc(zn(s.zone))],['Date',s=>s.date],['Planned',s=>s.start+'–'+s.end],['Actual',s=>s.actualStart?esc(s.actualStart.slice(11))+(s.actualEnd?'–'+esc(s.actualEnd.slice(11)):' (running)'):'—'],['Status',sbadge]];
+function render(){const hide=role()==='citizen';
+ document.querySelectorAll('#nav button').forEach(b=>{const v=b.dataset.v;b.style.display=hide&&!['pub'].includes(v)?'none':(isOp()&&['data'].includes(v)?'none':'');b.setAttribute('aria-current',v===cur)});
+ if(hide)cur='pub';$('#title').textContent=NAV.find(n=>n[0]===cur)[1];const v=$('#view');({dash,map,assets,sched,pub,data})[cur](v)}
+function dash(v){const n=now(),L=SCH,km=byT('pipeline').reduce((s,f)=>s+lenM(f),0)/1000,act_=L.filter(s=>s.status==='active'),td=L.filter(s=>s.date===n.date);
+ const k=[[byT('ward').length,'Wards'],[byT('zone').length,'Distribution zones'],[km.toFixed(1)+' km','Mapped pipeline'],[byT('valve').length,'Valves'],[byT('tank').length+byT('pump').length,'Tanks & pumps'],[act_.length,'Active sessions'],[td.filter(s=>['published','approved'].includes(s.status)).length,'Scheduled today'],[td.filter(s=>s.status==='completed').length,'Completed today'],[L.filter(s=>eff(s)==='delayed').length,'Delayed (not started)'],[D.features.filter(f=>!['verified','demo'].includes(P(f).verified)).length,'Unverified assets']];
+ const up=L.filter(s=>['published','approved'].includes(s.status)&&key(s)>=n.date+n.t.replace(':',':')).sort((a,b)=>key(a)<key(b)?-1:1),vis_=up.filter(s=>s.status==='published');
+ v.innerHTML=demoNote()+`<div class="cards">${k.map(c=>`<div class="card"><b>${c[0]}</b><span>${c[1]}</span></div>`).join('')}</div><div class="g2"><div>
+ <div class="pn"><h3>Currently distributing (operator-reported)</h3>${table(L.filter(s=>['active','paused'].includes(s.status)),[...sRows.slice(0,1),['Operator',s=>esc(s.op)],...sRows.slice(2)],'No session is currently recorded as active.')}<p class="n">Shows operator-recorded activity only. Valve position and water flow are not sensor-confirmed.</p></div>
+ <div class="pn"><h3>Next distribution</h3>${table(vis_.slice(0,1),[...sRows.slice(0,3),['Operator',s=>esc(s.op)],['Status',sbadge]],'No upcoming published schedule.')}</div></div>
+ <div class="pn"><h3>Upcoming distribution</h3>${table(vis_.slice(0,8),sRows.slice(0,3).concat([['Status',sbadge]]),'No upcoming published schedules.')}</div></div>`}
+function mapSvg(){if(!B)return'';const sch=Object.fromEntries(SCH.filter(s=>s.date===now().date&&['active','paused','published','approved'].includes(s.status)).map(s=>[s.zone,s.status])),q=($('#q')?.value||'').toLowerCase();
+ const hit=f=>q&&(P(f).id+' '+P(f).name).toLowerCase().includes(q),show=f=>vis[P(f).type]&&(vf==='all'||P(f).verified===vf),out=[];
+ const col=f=>{const v=P(f).verified;return v==='verified'?'#2e7d32':v==='rejected'?'#c62828':v==='demo'?'#c77800':'#78909c'};
+ for(const t of['ward','zone','pipeline','valve','tank','pump'])for(const f of byT(t)){if(!show(f))continue;const p=P(f),g=f.geometry,id=esc(p.id),on=selId===p.id||hit(f),d=`data-id="${id}" style="cursor:pointer"`;
+  if(t==='ward'||t==='zone'){const st=sch[p.id],fill=t==='zone'?(st==='active'?'rgba(63,165,53,.45)':st==='paused'?'rgba(199,120,0,.4)':st?'rgba(21,101,192,.3)':'rgba(120,144,152,.1)'):'none';
+   out.push(`<polygon ${d} points="${g.coordinates[0].map(pr).join(' ')}" fill="${on?'rgba(255,214,0,.4)':fill}" stroke="${t==='ward'?'#455a64':'#90a4ae'}" stroke-width="${on?3:t==='ward'?2:1}" stroke-dasharray="${t==='zone'?'5 3':''}"/>`)}
+  else if(t==='pipeline'){out.push(`<polyline ${d} points="${g.coordinates.map(pr).join(' ')}" fill="none" stroke="${on?'#ffd600':col(f)}" stroke-width="${on?7:Math.max(2,(p.dia||100)/70)}" stroke-linecap="round"/>`)}
+  else{const[x,y]=pr(g.coordinates).split(',').map(Number),c=on?'#ffd600':col(f);out.push(t==='valve'?`<circle ${d} cx="${x}" cy="${y}" r="${on?9:6}" fill="${c}" stroke="#fff" stroke-width="1.5"/>`:t==='tank'?`<rect ${d} x="${x-8}" y="${y-8}" width="16" height="16" fill="${c}" stroke="#fff" stroke-width="1.5"/>`:`<polygon ${d} points="${x},${y-10} ${x+9},${y+7} ${x-9},${y+7}" fill="${c}" stroke="#fff" stroke-width="1.5"/>`)}}
+ return out.join('')}
+function map(v){if(!B)bounds();v.style.padding='12px';v.innerHTML=`<div class="mapw"><div class="mp"><svg id="svg" viewBox="${VB?VB.join(' '):'0 0 800 560'}" role="img" aria-label="Network map">${B?mapSvg():''}</svg>
+ ${B?'':'<p style="padding:30px" class="n">No GIS data loaded. Import approved GeoJSON in the Data &amp; Audit section.</p>'}
+ <div class="leg"><div><i style="border-color:#2e7d32"></i>Verified</div><div><i style="border-color:#c77800"></i>Demo</div><div><i style="border-color:#78909c"></i>Draft / under review</div><div>Zone fill: <span style="color:#3fa535">active</span> · <span style="color:#1565c0">scheduled today</span></div><div>● valve ■ tank ▲ pump</div></div></div>
+ <div style="overflow:auto">${D.demo?'<div class="note">Demo layers — abstract geometry.</div>':''}<div class="pn"><h3>Search & filter</h3><input id="q" placeholder="Asset ID or name" style="width:100%;margin-bottom:8px"><select id="vf" style="width:100%"><option value="all">All verification statuses</option><option value="verified">verified</option><option value="demo">demo</option><option value="draft">draft</option><option value="under_review">under_review</option><option value="rejected">rejected</option></select></div>
+ <div class="pn chk"><h3>Layers</h3>${TYPES.map(t=>`<label><input type="checkbox" data-l="${t}" ${vis[t]?'checked':''}> ${t[0].toUpperCase()+t.slice(1)}s (${byT(t).length})</label>`).join('')}</div><div class="pn" id="det"></div></div></div>`;
+ $('#vf').value=vf;detail();const svg=$('#svg');if(!svg||!B)return;
+ const redraw=()=>{svg.innerHTML=mapSvg();svg.setAttribute('viewBox',VB.join(' '))};
+ $('#q').oninput=()=>{const q=$('#q').value.toLowerCase(),f=q&&D.features.find(f=>(P(f).id+' '+P(f).name).toLowerCase().includes(q));if(f){selId=P(f).id;zoomTo(f)}redraw();detail()};
+ $('#vf').onchange=e=>{vf=e.target.value;redraw()};document.querySelectorAll('[data-l]').forEach(c=>c.onchange=()=>{vis[c.dataset.l]=c.checked;redraw()});
+ svg.onclick=e=>{const id=e.target.dataset?.id;if(id){selId=id;redraw();detail()}};
+ svg.onwheel=e=>{e.preventDefault();const r=svg.getBoundingClientRect(),f=e.deltaY<0?.85:1.18,px=VB[0]+(e.clientX-r.left)/r.width*VB[2],py=VB[1]+(e.clientY-r.top)/r.height*VB[3];VB=[px-(px-VB[0])*f,py-(py-VB[1])*f,VB[2]*f,VB[3]*f];svg.setAttribute('viewBox',VB.join(' '))};
+ let dr;svg.onpointerdown=e=>{dr={x:e.clientX,y:e.clientY,v:[...VB]};svg.setPointerCapture(e.pointerId)};svg.onpointermove=e=>{if(!dr)return;const r=svg.getBoundingClientRect();VB=[dr.v[0]-(e.clientX-dr.x)/r.width*VB[2],dr.v[1]-(e.clientY-dr.y)/r.height*VB[3],VB[2],VB[3]];svg.setAttribute('viewBox',VB.join(' '))};svg.onpointerup=()=>dr=null;
+ function zoomTo(f){const a=pts(f.geometry).map(c=>pr(c).split(',').map(Number)),xs=a.map(c=>c[0]),ys=a.map(c=>c[1]),w=Math.max(Math.max(...xs)-Math.min(...xs),60)*1.6,h=Math.max(Math.max(...ys)-Math.min(...ys),40)*1.6,k=Math.max(w/800,h/560);VB=[(Math.min(...xs)+Math.max(...xs))/2-400*k,(Math.min(...ys)+Math.max(...ys))/2-280*k,800*k,560*k]}}
+function detail(){const el=$('#det');if(!el)return;const f=selId&&feat(selId);if(!f){el.innerHTML='<h3>Asset details</h3><p class="n">Click a feature on the map.</p>';return}const p=P(f);
+ const extra=Object.entries(p).filter(([k])=>!['type','id','name','verified'].includes(k)).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+ el.innerHTML=`<h3>${esc(p.type)}</h3><b>${esc(p.name||p.id)}</b><dl class="kv"><dt>ID</dt><dd>${esc(p.id)}</dd><dt>Verification</dt><dd>${vtag(f)}</dd>${f.geometry.type==='LineString'?`<dt>Length</dt><dd>${lenM(f).toFixed(0)} m</dd>`:''}${extra}</dl>${p.verified==='verified'?'':'<p class="n">Not verified for operational use.</p>'}`}
+function assets(v){const rows=D.features.filter(f=>['pipeline','valve','tank','pump'].includes(P(f).type));
+ v.innerHTML=demoNote()+`<div class="pn"><h3>Pipeline, valve, tank and pump register (${rows.length})</h3>`+table(rows,[['ID',f=>esc(P(f).id)],['Name',f=>esc(P(f).name)],['Type',f=>P(f).type],['Dia (mm)',f=>esc(P(f).dia??'—')],['Material',f=>esc(P(f).material??'—')],['Length (m)',f=>P(f).type==='pipeline'?lenM(f).toFixed(0):'—'],['Zone',f=>esc(P(f).zone??'—')],['Status',f=>esc(P(f).status??'—')],['Verification',vtag]])+'</div>'}
+function sched(v){const off=isOff(),list=SCH.slice().sort((a,b)=>key(a)<key(b)?-1:1).filter(s=>!isOp()||s.op===me()),zs=byT('zone');
+ const form=off?`<div class="pn"><h3>New schedule (draft)</h3><div class="row"><div><label>Zone</label><select id="fz">${zs.map(z=>`<option value="${esc(P(z).id)}">${esc(P(z).name)}</option>`).join('')}</select></div><div><label>Date</label><input type="date" id="fd" value="${now().date}"></div><div><label>Start</label><input type="time" id="fs" value="06:00"></div><div><label>End</label><input type="time" id="fe" value="08:00"></div><div><label>Operator</label><select id="fo">${OPS.map(o=>`<option>${o}</option>`).join('')}</select></div></div><div class="chk" id="fv"></div><button class="btn" id="fc" style="margin-top:8px">Create draft</button></div>`:'';
+ v.innerHTML=ctrlNote+(flash?`<div class="msg ${flash.startsWith('✓')?'k':'e'}" role="status">${esc(flash)}</div>`:'')+form+`<div class="pn"><h3>${isOp()?'My assignments':'Schedules'}</h3><div class="row"><div><label for="rs">Reason / remarks (required for reject, cancel, early stop)</label><input id="rs" style="width:320px"></div></div>`+
+ table(list,[['ID',s=>s.id],...sRows,['Operator',s=>esc(s.op)],['Actions',s=>acts(s)]],'No schedules.')+'</div>';
+ if(off){const fz=$('#fz'),ren=()=>{const z=fz.value;$('#fv').innerHTML='<label class="n">Valves (shared valves are conflict-checked)</label>'+byT('valve').filter(x=>P(x).zone===z).map(x=>`<label><input type="checkbox" value="${esc(P(x).id)}" checked> ${esc(P(x).name)}</label>`).join('')};fz.onchange=ren;ren();
+  $('#fc').onclick=()=>{const c={zone:fz.value,date:$('#fd').value,start:$('#fs').value,end:$('#fe').value,op:$('#fo').value,valves:[...document.querySelectorAll('#fv input:checked')].map(x=>x.value)};
+   if(!c.date||!c.start||!c.end)flash='Date, start and end are required.';else if(c.end<=c.start)flash='End time must be later than start time.';else if(!c.valves.length)flash='Select at least one valve.';
+   else{const zf=feat(c.zone);const id='S-'+(Math.max(0,...SCH.map(s=>+s.id.slice(2)))+1);SCH.push({id,...c,status:'draft',log:[]});audit('schedule.create',id);save();const w=conflicts(c);flash='✓ Draft '+id+' created.'+(P(zf).verified==='verified'||P(zf).verified==='demo'?'':' Warning: zone is not verified.')+(w.length?' Conflicts detected (must be resolved before submit): '+w.join('; '):'')}render()}}
+ v.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const m=act(b.dataset.id,b.dataset.a,$('#rs').value);flash=m&&m!=='undefined'&&m.length>2?m:'✓ Done: '+b.dataset.a;render()})}
+function acts(s){const o=isOff(),op=isOp()&&s.op===me(),B_=(a,l,c='')=>`<button class="btn s ${c}" data-a="${a}" data-id="${s.id}">${l}</button> `;let h='';
+ if(o){if(s.status==='draft')h+=B_('submit','Submit');if(s.status==='submitted')h+=B_('approve','Approve')+B_('reject','Reject','o');if(s.status==='approved')h+=B_('publish','Publish');if(['draft','submitted','approved','published'].includes(s.status))h+=B_('cancel','Cancel','r')}
+ if(op){if(s.status==='published')h+=B_('start','Mark Distribution Started');if(s.status==='active')h+=B_('pause','Pause','o')+B_('stop','Stop','r');if(s.status==='paused')h+=B_('resume','Resume')+B_('stop','Stop','r')}return h||'—'}
+function pub(v){const ws=byT('ward');v.innerHTML=demoNote()+`<div class="pn"><h3>Find my ward</h3><div class="row"><div><label for="pw">Ward</label><select id="pw"><option value="">Select ward</option>${ws.map(w=>`<option value="${esc(P(w).id)}">${esc(P(w).name)}</option>`).join('')}</select></div></div><div id="pr"><p class="n">Select a ward to see published water distribution schedules.</p></div></div><p class="n">Only published schedules are shown. Times are planned; actual supply may vary. Operator details are not public.</p>`;
+ $('#pw').onchange=e=>{const w=e.target.value;if(!w){$('#pr').innerHTML='';return}const zs=byT('zone').filter(z=>P(z).ward===w).map(z=>P(z).id),n=now();
+  const r=SCH.filter(s=>zs.includes(s.zone)&&['published','active','paused','completed','interrupted'].includes(s.status)&&s.date>=n.date).sort((a,b)=>key(a)<key(b)?-1:1);
+  $('#pr').innerHTML=table(r,[['Zone',s=>esc(zn(s.zone))],['Date',s=>s.date],['Planned time',s=>s.start+'–'+s.end],['Status',s=>sbadge({...s,status:s.status==='active'?'active':s.status})]],'No published schedules for this ward.')}}
+function data(v){const adm=role()==='admin';v.innerHTML=ctrlNote+`<div class="pn"><h3>GeoJSON data (publish approved network data)</h3><p class="n">Each feature needs properties: type (ward, zone, pipeline, valve, tank, pump), a unique id, and optionally name, verified (draft, under_review, verified, rejected), zone/ward, dia, material. Wards and zones are Polygons, pipelines are LineStrings, other assets are Points. Coordinates: longitude/latitude (WGS84).</p><textarea id="gj" spellcheck="false" placeholder="Paste FeatureCollection"></textarea>
+ <div class="row" style="margin-top:8px"><button class="btn" id="imp" ${adm||role()==='officer'?'':'disabled'}>Validate &amp; import (replaces current data)</button><button class="btn o" id="exp">Export current</button><button class="btn o" id="rst">Reset to demo</button></div><div id="im"></div>
+ <label class="n"><input type="checkbox" id="win" ${CFG.window?'checked':''} ${adm?'':'disabled'}> Enforce operating window for session start (administrator setting)</label></div>
+ <div class="pn"><h3>Audit log (latest 40)</h3>${table(LOG.slice(-40).reverse(),[['Time',l=>esc(l.at.slice(0,19).replace('T',' '))],['By',l=>esc(l.by)],['Action',l=>esc(l.a)],['Record',l=>esc(l.id)],['Remarks',l=>esc(l.d)]],'No audit events yet.')}<p class="n">This log lives in the browser. A production system needs an append-only server-side audit trail.</p></div>`;
+ $('#exp').onclick=()=>{$('#gj').value=JSON.stringify({type:'FeatureCollection',features:D.features},null,1)};
+ $('#rst').onclick=()=>{D=DEMO;SCH=seed();selId=null;bounds();audit('data.reset','demo');save();render()};
+ $('#win').onchange=e=>{CFG.window=e.target.checked;audit('config.window',String(CFG.window));save()};
+ $('#imp').onclick=()=>{let j;try{j=JSON.parse($('#gj').value)}catch(e){$('#im').innerHTML='<div class="msg e">Not valid JSON.</div>';return}const er=validate(j);if(er){$('#im').innerHTML=`<div class="msg e">${esc(er)}</div>`;return}
+  j.features.forEach(f=>{f.properties.verified=['verified','under_review','rejected','draft'].includes(f.properties.verified)?f.properties.verified:'draft'});
+  D={demo:false,features:j.features};const ids=new Set(D.features.map(f=>P(f).id));SCH=SCH.filter(s=>ids.has(s.zone));selId=null;bounds();audit('data.import',String(j.features.length)+' features');save();$('#im').innerHTML=`<div class="msg k">Imported ${j.features.length} features. Schedules referencing missing zones were removed. Unverified features are marked draft.</div>`}}
+/* ---------- i18n (English / Marathi) + theme ---------- */
+const MR={'Dashboard':'डॅशबोर्ड','GIS Map':'जीआयएस नकाशा','Assets':'मालमत्ता','Schedules':'वेळापत्रके','Public View':'नागरिक दृश्य','Data & Audit':'डेटा आणि ऑडिट',
+'Latur Municipal Corporation':'लातूर महानगरपालिका','Water Network Portal':'जल जाळे पोर्टल','Logo placeholder · configurable':'लोगो जागा · बदलता येण्याजोगा','Maps: schematic, no basemap':'नकाशे: आकृतीबद्ध, बेसमॅप नाही',
+'View as':'पाहण्याचा प्रकार','Citizen (public)':'नागरिक (सार्वजनिक)','Operator Op-1':'ऑपरेटर Op-1','Operator Op-2':'ऑपरेटर Op-2','Officer':'अधिकारी','Administrator':'प्रशासक',
+'Demonstration data.':'डेमो डेटा.','These assets use abstract coordinates and are not real Latur boundaries, pipelines or valves. Import approved GeoJSON in the Data & Audit section.':'ही मालमत्ता काल्पनिक निर्देशांक वापरते; ती लातूरच्या खऱ्या सीमा, जलवाहिन्या किंवा व्हॉल्व्ह नाहीत. मंजूर GeoJSON "डेटा आणि ऑडिट" विभागात आयात करा.',
+'Role switching here is a preview of workspaces only — it is not security. Real authentication and server-side permissions require the backend. Data is stored in this browser only.':'येथील भूमिका बदल फक्त कार्यक्षेत्रांचे पूर्वावलोकन आहे — ही सुरक्षा नाही. खरे लॉगिन आणि सर्व्हर-स्तरीय परवानग्यांसाठी बॅकएंड आवश्यक आहे. डेटा फक्त या ब्राउझरमध्ये साठवला जातो.',
+'Wards':'प्रभाग','Distribution zones':'वितरण क्षेत्रे','Mapped pipeline':'नकाशित जलवाहिनी','Valves':'व्हॉल्व्ह','Tanks & pumps':'टाक्या व पंप','Active sessions':'सक्रिय सत्रे','Scheduled today':'आज नियोजित','Completed today':'आज पूर्ण','Delayed (not started)':'विलंबित (सुरू न झालेले)','Unverified assets':'असत्यापित मालमत्ता',
+'Currently distributing (operator-reported)':'सध्या पाणीपुरवठा सुरू (ऑपरेटरने नोंदवलेले)','Next distribution':'पुढील वितरण','Upcoming distribution':'आगामी वितरण',
+'Zone':'क्षेत्र','Date':'दिनांक','Planned':'नियोजित','Actual':'प्रत्यक्ष','Status':'स्थिती','Operator':'ऑपरेटर','Actions':'कृती','ID':'आयडी','Name':'नाव','Type':'प्रकार','Dia (mm)':'व्यास (मिमी)','Material':'साहित्य','Length (m)':'लांबी (मी)','Verification':'सत्यापन','Length':'लांबी','Time':'वेळ','By':'द्वारे','Action':'कृती','Record':'नोंद','Remarks':'शेरा','Planned time':'नियोजित वेळ','Start':'सुरू','End':'समाप्ती','Ward':'प्रभाग',
+'No session is currently recorded as active.':'सध्या कोणतेही सत्र सक्रिय म्हणून नोंदवलेले नाही.','No upcoming published schedule.':'आगामी प्रकाशित वेळापत्रक नाही.','No upcoming published schedules.':'आगामी प्रकाशित वेळापत्रके नाहीत.','No records.':'नोंदी नाहीत.','No schedules.':'वेळापत्रके नाहीत.','No published schedules for this ward.':'या प्रभागासाठी प्रकाशित वेळापत्रके नाहीत.','No audit events yet.':'अद्याप ऑडिट नोंदी नाहीत.',
+'Shows operator-recorded activity only. Valve position and water flow are not sensor-confirmed.':'फक्त ऑपरेटरने नोंदवलेली कृती दर्शवते. व्हॉल्व्हची स्थिती व पाण्याचा प्रवाह सेन्सरद्वारे पुष्टी केलेला नाही.',
+'Draft':'मसुदा','Submitted':'सादर केले','Approved':'मंजूर','Published':'प्रकाशित','Active':'सक्रिय','Paused':'थांबवलेले','Completed':'पूर्ण','Interrupted':'खंडित','Cancelled':'रद्द','Delayed':'विलंबित',
+'verified':'सत्यापित','demo':'डेमो','draft':'मसुदा','under_review':'पुनरावलोकनाधीन','rejected':'नाकारले','operational':'कार्यरत','ward':'प्रभाग','zone':'क्षेत्र','pipeline':'जलवाहिनी','valve':'व्हॉल्व्ह','tank':'टाकी','pump':'पंप',
+'dia':'व्यास (मिमी)','material':'साहित्य','status':'स्थिती','capacity_kl':'क्षमता (किलोलिटर)',
+'Demo layers — abstract geometry.':'डेमो स्तर — काल्पनिक भूमिती.','Search & filter':'शोधा व गाळा','Asset ID or name':'मालमत्ता आयडी किंवा नाव','All verification statuses':'सर्व सत्यापन स्थिती','Layers':'स्तर','Asset details':'मालमत्ता तपशील','Click a feature on the map.':'नकाशावरील घटकावर क्लिक करा.','Not verified for operational use.':'कार्यान्वयनासाठी सत्यापित नाही.','Network map':'जाळे नकाशा',
+'No GIS data loaded. Import approved GeoJSON in the Data & Audit section.':'कोणताही GIS डेटा लोड केलेला नाही. मंजूर GeoJSON "डेटा आणि ऑडिट" विभागात आयात करा.',
+'Verified':'सत्यापित','Demo':'डेमो','Draft / under review':'मसुदा / पुनरावलोकनाधीन','Zone fill:':'क्षेत्र रंग:','active':'सक्रिय','scheduled today':'आज नियोजित','● valve ■ tank ▲ pump':'● व्हॉल्व्ह ■ टाकी ▲ पंप',
+'New schedule (draft)':'नवीन वेळापत्रक (मसुदा)','Valves (shared valves are conflict-checked)':'व्हॉल्व्ह (सामायिक व्हॉल्व्हची संघर्ष तपासणी होते)','Create draft':'मसुदा तयार करा','My assignments':'माझी कामे','Reason / remarks (required for reject, cancel, early stop)':'कारण / शेरा (नाकारणे, रद्द करणे, लवकर थांबवणे यासाठी आवश्यक)',
+'Submit':'सादर करा','Approve':'मंजूर करा','Reject':'नाकारा','Publish':'प्रकाशित करा','Cancel':'रद्द करा','Mark Distribution Started':'वितरण सुरू केल्याची नोंद','Pause':'थांबवा','Stop':'बंद करा','Resume':'पुन्हा सुरू करा',
+'Date, start and end are required.':'दिनांक, सुरुवात व समाप्ती आवश्यक आहेत.','End time must be later than start time.':'समाप्तीची वेळ सुरुवातीनंतर असावी.','Select at least one valve.':'किमान एक व्हॉल्व्ह निवडा.','A reason is required for this action.':'या कृतीसाठी कारण आवश्यक आहे.','Stopping before the planned end requires a reason.':'नियोजित समाप्तीपूर्वी थांबवण्यासाठी कारण आवश्यक आहे.',
+'Outside the permitted operating window (30 min before start until planned end, same day).':'परवानगी असलेल्या वेळेच्या बाहेर (सुरुवातीच्या 30 मिनिटे आधीपासून नियोजित समाप्तीपर्यंत, त्याच दिवशी).','Action not allowed for your role or the current status.':'तुमच्या भूमिकेसाठी किंवा सध्याच्या स्थितीसाठी ही कृती अनुमत नाही.','Not found':'सापडले नाही',
+'Find my ward':'माझा प्रभाग शोधा','Select ward':'प्रभाग निवडा','Select a ward to see published water distribution schedules.':'प्रकाशित पाणीपुरवठा वेळापत्रके पाहण्यासाठी प्रभाग निवडा.','Only published schedules are shown. Times are planned; actual supply may vary. Operator details are not public.':'फक्त प्रकाशित वेळापत्रके दाखवली आहेत. वेळा नियोजित आहेत; प्रत्यक्ष पुरवठा बदलू शकतो. ऑपरेटरचा तपशील सार्वजनिक नाही.',
+'GeoJSON data (publish approved network data)':'GeoJSON डेटा (मंजूर जाळे डेटा प्रकाशित करा)','Each feature needs properties: type (ward, zone, pipeline, valve, tank, pump), a unique id, and optionally name, verified (draft, under_review, verified, rejected), zone/ward, dia, material. Wards and zones are Polygons, pipelines are LineStrings, other assets are Points. Coordinates: longitude/latitude (WGS84).':'प्रत्येक घटकासाठी properties आवश्यक: type (ward, zone, pipeline, valve, tank, pump), अद्वितीय id, तसेच पर्यायी name, verified (draft, under_review, verified, rejected), zone/ward, dia, material. प्रभाग व क्षेत्रे Polygon, जलवाहिन्या LineString, इतर मालमत्ता Point असाव्यात. निर्देशांक: रेखांश/अक्षांश (WGS84).',
+'Paste FeatureCollection':'FeatureCollection येथे पेस्ट करा','Validate & import (replaces current data)':'तपासा व आयात करा (सध्याचा डेटा बदलला जाईल)','Export current':'सध्याचा निर्यात करा','Reset to demo':'डेमोवर रीसेट करा','Enforce operating window for session start (administrator setting)':'सत्र सुरू करण्यासाठी वेळेची मर्यादा लागू करा (प्रशासक सेटिंग)','Audit log (latest 40)':'ऑडिट नोंद (अलीकडील 40)','This log lives in the browser. A production system needs an append-only server-side audit trail.':'ही नोंद ब्राउझरमध्ये आहे. प्रत्यक्ष प्रणालीसाठी सर्व्हरवरील केवळ-जोडता-येणारा ऑडिट आवश्यक आहे.','Not valid JSON.':'वैध JSON नाही.','Must be a GeoJSON FeatureCollection with at least one feature.':'किमान एक घटक असलेला GeoJSON FeatureCollection असणे आवश्यक आहे.',
+'Demo Tank':'डेमो टाकी','Demo Pumping Station':'डेमो पंपिंग स्टेशन','Valve Main (shared)':'मुख्य व्हॉल्व्ह (सामायिक)','Main A':'मुख्य A'};
+const ACT={submit:'सादर करा',approve:'मंजूर करा',reject:'नाकारा',publish:'प्रकाशित करा',cancel:'रद्द करा',start:'सुरू केले',pause:'थांबवले',resume:'पुन्हा सुरू',stop:'बंद केले'};
+const RX=[[/^(Ward|Zone|Pipeline|Valve|Tank|Pump)s \((\d+)\)$/,(m,a,b)=>MR[a.toLowerCase()]+' ('+b+')'],[/^Pipeline, valve, tank and pump register \((\d+)\)$/,'जलवाहिनी, व्हॉल्व्ह, टाकी व पंप नोंदवही ($1)'],
+[/^([\d.]+) km$/,'$1 किमी'],[/^(\d+) m$/,'$1 मी'],[/^Demo Ward (\d+)$/,'डेमो प्रभाग $1'],[/^Demo Zone (\w+)$/,'डेमो क्षेत्र $1'],[/^Valve (\w+)$/,'व्हॉल्व्ह $1'],[/^Branch (\w+)$/,'शाखा $1'],
+[/^Missing or duplicate id: (.*)$/,'आयडी नाही किंवा पुनरावृत्त: $1'],[/^(.+): (ward|zone|pipeline|valve|tank|pump) must be a (Polygon|LineString|Point)\.$/,(m,a,b,c)=>a+': '+MR[b]+' हे '+c+' असणे आवश्यक आहे.'],
+[/^(.+): invalid coordinates\.$/,'$1: निर्देशांक अवैध आहेत.'],[/^(.+): polygon ring needs at least 4 points\.$/,'$1: बहुभुज रिंगसाठी किमान 4 बिंदू आवश्यक आहेत.'],[/^Each feature needs properties\.type in: (.*)\.$/,'प्रत्येक घटकास properties.type आवश्यक आहे: $1.'],
+[/^Imported (\d+) features\. Schedules referencing missing zones were removed\. Unverified features are marked draft\.$/,'आयात केले: $1 घटक. नसलेल्या क्षेत्रांशी संबंधित वेळापत्रके काढली. असत्यापित घटक "मसुदा" म्हणून चिन्हांकित.'],
+[/^✓ Done: (\w+)$/,(m,a)=>'✓ पूर्ण: '+(ACT[a]||a)],[/✓ Draft (S-\d+) created\./,'✓ मसुदा $1 तयार केला.'],[/ Warning: zone is not verified\./,' इशारा: क्षेत्र सत्यापित नाही.'],[/ Conflicts detected \(must be resolved before submit\): /,' संघर्ष आढळले (सादर करण्यापूर्वी सोडवा): '],
+[/^Conflict: /,'संघर्ष: '],[/(S-\d+): operator (\S+) already assigned ([\d:–-]+)/g,'$1: ऑपरेटर $2 ला $3 साठी आधीच नियुक्त केले आहे'],[/(S-\d+): shared valve (.+?) used ([\d:–-]+)/g,'$1: सामायिक व्हॉल्व्ह $2 $3 वापरात आहे'],[/Blocked: valve in use by active session (S-\d+)\./,'अवरोधित: व्हॉल्व्ह सक्रिय सत्र $1 मध्ये वापरात आहे.'],[/ \(running\)/,' (सुरू आहे)']];
+function trs(s){if(MR[s])return MR[s];let o=s;for(const[r,f]of RX)o=o.replace(r,f);return o}
+let lang=ld('lm_lang','en'),theme=ld('lm_theme',null);const orig=new WeakMap(),AT=['placeholder','aria-label','title'];
+function xt(n){const v=n.nodeValue,b=orig.has(n)?orig.get(n):v,t=b.trim();if(lang==='mr'&&t){const r=trs(t);if(r!==t){if(!orig.has(n))orig.set(n,v);n.nodeValue=b.replace(t,()=>r)}}else if(orig.has(n)){n.nodeValue=orig.get(n);orig.delete(n)}}
+function xa(e){e._en=e._en||{};for(const a of AT){if(!e.hasAttribute||!e.hasAttribute(a))continue;const b=e._en[a]??e.getAttribute(a);e._en[a]=b;e.setAttribute(a,lang==='mr'?(trs(b)):b)}}
+function walk(root){if(root.nodeType===3){if(!['TEXTAREA','SCRIPT','STYLE'].includes(root.parentNode?.tagName))xt(root);return}if(root.nodeType!==1)return;xa(root);const w=document.createTreeWalker(root,5);let n;while((n=w.nextNode())){if(n.nodeType===3){if(!['TEXTAREA','SCRIPT','STYLE'].includes(n.parentNode?.tagName))xt(n)}else xa(n)}}
+function applyTheme(){const dark=theme?theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches,b=$('#th'),m=lang==='mr';document.documentElement.dataset.theme=dark?'dark':'light';b.textContent=(dark?'☀ ':'☾ ')+(m?(dark?'प्रकाश':'गडद'):(dark?'Light':'Dark'));b.setAttribute('aria-label',m?(dark?'प्रकाश मोडवर जा':'गडद मोडवर जा'):(dark?'Switch to light mode':'Switch to dark mode'))}
+function setLang(l){lang=l;sv('lm_lang',l);document.documentElement.lang=l;document.title=l==='mr'?'लातूर महानगरपालिका — जल जाळे डेटा व वितरण पोर्टल':'Latur Municipal Corporation — Water Network Data & Distribution Portal';
+ $('#lg').textContent=l==='mr'?'English':'मराठी';$('#lg').setAttribute('aria-label',l==='mr'?'Switch to English':'मराठीत बदला');applyTheme();walk(document.body);render()}
+$('#th').onclick=()=>{theme=document.documentElement.dataset.theme==='dark'?'light':'dark';sv('lm_theme',theme);applyTheme();render()};
+$('#lg').onclick=()=>setLang(lang==='mr'?'en':'mr');
+/*INIT*/
+bounds();new MutationObserver(ms=>{if(lang!=='mr')return;ms.forEach(m=>m.addedNodes.forEach(walk))}).observe(document.body,{childList:true,subtree:true});setLang(lang);
+
+</script>
+</body>
+</html>

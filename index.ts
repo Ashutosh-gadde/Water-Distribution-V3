@@ -1,0 +1,28 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Content-Type': 'application/json' };
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: cors });
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
+  const url = Deno.env.get('SUPABASE_URL')!, anon = Deno.env.get('SUPABASE_ANON_KEY')!, service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const authHeader = req.headers.get('Authorization'); if (!authHeader) return json({ error: 'Missing bearer token' }, 401);
+  const caller = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
+  const { data: { user }, error: userError } = await caller.auth.getUser();
+  if (userError || !user) return json({ error: 'Invalid session' }, 401);
+  const { data: profile } = await caller.from('profiles').select('role,active').eq('id', user.id).single();
+  if (!profile?.active || profile.role !== 'admin') return json({ error: 'Administrator permission required' }, 403);
+  const body = await req.json().catch(() => null);
+  const email = String(body?.email || '').trim().toLowerCase();
+  const display_name = String(body?.display_name || '').trim();
+  const role = String(body?.role || 'operator');
+  const operator_code = String(body?.operator_code || '').trim() || null;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'Valid email is required' }, 400);
+  if (!['operator','officer','citizen'].includes(role)) return json({ error: 'Only operator, officer, or citizen accounts may be created here' }, 400);
+  const admin = createClient(url, service, { auth: { persistSession: false, autoRefreshToken: false } });
+  const { data, error } = await admin.auth.admin.inviteUserByEmail(email, { data: { display_name } });
+  if (error || !data.user) return json({ error: error?.message || 'Invite failed' }, 400);
+  const { error: profileError } = await admin.from('profiles').upsert({ id: data.user.id, display_name, role, operator_code, active: true });
+  if (profileError) return json({ error: `User invited but profile setup failed: ${profileError.message}` }, 500);
+  await admin.from('audit_events').insert({ actor_id: user.id, action: 'user.invite', entity_type: 'profile', entity_id: data.user.id, details: { email, role, operator_code } });
+  return json({ ok: true, user_id: data.user.id, message: 'Invitation sent. The user must accept it and set a password.' });
+});

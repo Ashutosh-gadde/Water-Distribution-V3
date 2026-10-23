@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latur Municipal Corporation — Water Distribution & GIS Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map { height: calc(100vh - 64px); min-height: 550px; }
+        .leaflet-top.leaflet-right { z-index: 1000; }
+    </style>
+    <!-- Supabase JS Client CDN -->
+    <!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // Global Supabase Client Initialization (Declared ONCE only)
+    if (typeof supabaseClient === 'undefined') {
+        var SUPABASE_URL = 'https://tfbiobjijzcbpcpnrtnh.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmYmlvYmppanpjYnBjcG5ydG5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNDAxMDQsImV4cCI6MjEwNzcxNjEwNH0.COzS4Wi1eBuF24OjjZaw9pppFEvp1I0kQKkZtWobDZM';
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+</script>
+</head>
+<body class="h-full bg-slate-100 text-slate-900 font-sans flex flex-col overflow-hidden">
+
+    <!-- ================= AUTHENTICATION MODAL ================= -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 space-y-5 border border-slate-200">
+            <div class="text-center space-y-1">
+                <div class="inline-block bg-blue-600 text-white font-bold text-sm px-3 py-1.5 rounded-lg mb-1">💧 LMC GIS Portal</div>
+                <h2 class="text-lg font-bold text-slate-900">Latur Municipal Water Network</h2>
+                <p class="text-xs text-slate-500">Secure Role-Based Access Control (IST)</p>
+            </div>
+
+            <div class="flex border-b border-slate-200 text-xs font-semibold">
+                <button onclick="switchAuthTab('citizen')" id="tab-auth-citizen" class="flex-1 pb-2 border-b-2 border-blue-600 text-blue-600 text-center">Citizen Login</button>
+                <button onclick="switchAuthTab('staff')" id="tab-auth-staff" class="flex-1 pb-2 border-b-2 border-transparent text-slate-500 text-center">Municipal Staff Login</button>
+            </div>
+
+            <!-- Citizen Login Form -->
+            <div id="form-citizen" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Mobile Number</label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-300 bg-slate-50 text-slate-500 text-xs">+91</span>
+                        <input type="tel" id="citizen-mobile" maxlength="10" placeholder="9876543210" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-slate-300 text-xs focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Access: View public schedules, map pipeline network, & file complaints.</p>
+                </div>
+                <button onclick="loginAsCitizen()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-lg shadow transition">Login as Citizen</button>
+            </div>
+
+            <!-- Staff Library Login Form -->
+            <div id="form-staff" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Staff Username / Email ID</label>
+                    <input type="text" id="staff-username" placeholder="e.g. admin@latur.gov.in" class="w-full text-xs border border-slate-300 rounded-md p-2 bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" id="staff-password" placeholder="Enter staff password" class="w-full text-xs border border-slate-300 rounded-md p-2 bg-white">
+                </div>
+                <div class="text-[11px] bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-600 space-y-0.5">
+                    <span class="font-bold block text-slate-700">Database Credentials Reference:</span>
+                    <div>• Admin: <code class="bg-slate-200 px-1 rounded">admin@latur.gov.in</code> / <code class="bg-slate-200 px-1 rounded">admin123</code></div>
+                    <div>• Officer: <code class="bg-slate-200 px-1 rounded">officer@latur.gov.in</code> / <code class="bg-slate-200 px-1 rounded">officer123</code></div>
+                    <div>• Operator W1: <code class="bg-slate-200 px-1 rounded">operator_w1@latur.gov.in</code> / <code class="bg-slate-200 px-1 rounded">op123</code></div>
+                </div>
+                <button onclick="loginAsStaff()" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2.5 rounded-lg shadow transition">Verify & Authenticate Staff</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MAIN APP INTERFACE ================= -->
+    <div id="app-container" class="hidden h-full flex flex-col">
+        <!-- Top Navigation -->
+        <header class="bg-slate-900 text-white shadow-md px-6 py-3 flex justify-between items-center z-50">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1.5 rounded shadow">💧 LMC GIS</div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wide">Latur Municipal Corporation — Water Distribution System</h1>
+                    <p class="text-[11px] text-slate-400">Live GIS Monitoring & Operations Portal</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="user-session-badge" class="bg-slate-800 text-blue-400 text-xs px-3 py-1 rounded-full border border-slate-700 font-medium">Role: Citizen</span>
+                <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-md font-medium transition">Logout</button>
+            </div>
+        </header>
+
+        <!-- Notification Banner -->
+        <div id="live-alert-banner" class="hidden bg-amber-500 text-slate-950 px-6 py-2 text-xs font-bold flex justify-between items-center shadow-inner z-40">
+            <span id="alert-msg">⚡ SYSTEM NOTIFICATION: Water distribution active. Pipeline symbology updated.</span>
+            <button onclick="document.getElementById('live-alert-banner').classList.add('hidden')" class="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px]">Dismiss</button>
+        </div>
+
+        <!-- Workspace Container -->
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar Navigation & Dashboards -->
+            <aside class="w-96 bg-white border-r border-slate-200 flex flex-col z-40 shadow-sm">
+                <div class="p-2 border-b border-slate-200 flex space-x-1 bg-slate-50" id="sidebar-tabs">
+                    <button onclick="switchTab('map')" id="btn-tab-map" class="flex-1 py-1.5 text-xs font-semibold rounded bg-blue-600 text-white transition shadow-xs">GIS Map</button>
+                    <button onclick="switchTab('schedules')" id="btn-tab-schedules" class="flex-1 py-1.5 text-xs font-semibold rounded bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition">Schedules</button>
+                    <button onclick="switchTab('complaints')" id="btn-tab-complaints" class="flex-1 py-1.5 text-xs font-semibold rounded bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition">Complaints</button>
+                    <button onclick="switchTab('management')" id="btn-tab-management" class="flex-1 py-1.5 text-xs font-semibold rounded bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition hidden">Management</button>
+                </div>
+
+                <!-- Tab 1: GIS Map & Asset Inspector -->
+                <div id="tab-map" class="p-4 flex-1 overflow-y-auto space-y-4">
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-blue-900 mb-1">🗺️ Map Symbology Legend</h3>
+                        <ul class="text-[11px] text-blue-700 space-y-1 mt-1">
+                            <li>🟢 <strong class="text-emerald-700">Green:</strong> Active Water Distribution Flow (Live Ward)</li>
+                            <li>🟡 <strong class="text-amber-700">Yellow:</strong> Upcoming Scheduled Ward Pipeline</li>
+                            <li>⚫ <strong class="text-slate-700">Black:</strong> Standby / Completed Network Pipelines</li>
+                        </ul>
+                    </div>
+                    <div class="space-y-2">
+                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Asset Specs Inspector</h4>
+                        <div id="asset-details-box" class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600 space-y-1">
+                            <span class="italic text-slate-400">Click any asset on the map to inspect specifications.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Public Schedules View -->
+                <div id="tab-schedules" class="p-4 flex-1 overflow-y-auto space-y-3 hidden">
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Ward Water Distribution Schedules</h3>
+                    <div id="public-schedules-container" class="space-y-2"></div>
+                </div>
+
+                <!-- Tab 3: Complaints View & Submission -->
+                <div id="tab-complaints" class="p-4 flex-1 overflow-y-auto space-y-4 hidden">
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">File Water Supply Complaint</h3>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-700 mb-1">Mobile Number (Mandatory, Verified)</label>
+                            <input type="text" id="comp-mobile" readonly class="w-full text-xs border bg-slate-50 rounded p-2 text-slate-600 font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-700 mb-1">Select Ward / Locality</label>
+                            <select id="comp-ward-select" class="w-full text-xs border border-slate-300 rounded p-2 bg-white"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-700 mb-1">Complaint Type</label>
+                            <select id="comp-type" class="w-full text-xs border border-slate-300 rounded p-2 bg-white">
+                                <option>Low Water Pressure / No Supply</option>
+                                <option>Pipeline Leakage / Burst</option>
+                                <option>Contaminated Water / Quality Issue</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-700 mb-1">Location Coordinates</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="comp-coords" placeholder="Lat, Lng" readonly class="flex-1 text-xs border rounded p-1.5 bg-slate-50">
+                                <button onclick="fetchLiveLocation()" class="bg-slate-800 text-white text-[10px] px-2.5 py-1.5 rounded font-medium">📍 Live GPS</button>
+                                <button onclick="enableMapPinSelection()" class="bg-blue-600 text-white text-[10px] px-2.5 py-1.5 rounded font-medium">🗺️ Pick Map</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-700 mb-1">Description</label>
+                            <textarea id="comp-desc" placeholder="Describe the issue..." class="w-full text-xs border border-slate-300 rounded p-2 h-16"></textarea>
+                        </div>
+                        <button onclick="submitComplaint()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded shadow transition">Submit Complaint</button>
+                        <div id="comp-receipt" class="hidden text-xs bg-emerald-50 border border-emerald-200 p-2.5 rounded text-emerald-900 font-medium"></div>
+                    </div>
+
+                    <div class="border-t border-slate-200 pt-3 space-y-2">
+                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Your Tracked Complaints</h4>
+                        <div id="citizen-complaints-list" class="space-y-2 text-xs"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Municipal Staff Management -->
+                <div id="tab-management" class="p-4 flex-1 overflow-y-auto space-y-4 hidden">
+                    <div id="operator-controls-section" class="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2 hidden">
+                        <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider">⚡ Valve Operator Flow Controls</h3>
+                        <p class="text-[11px] text-amber-700" id="operator-ward-label">Assigned Ward: Loading...</p>
+                        <button onclick="triggerAssignedWaterFlow()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 rounded shadow transition">🟢 Start Water Flow for Assigned Ward</button>
+                        <button onclick="stopWaterFlow()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2 rounded shadow transition">⚫ End Distribution (Reset)</button>
+                    </div>
+
+                    <div id="officer-schedule-section" class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2 hidden">
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">📅 Edit Distribution Schedule (Officer Only)</h3>
+                        <select id="edit-schedule-idx" class="w-full text-xs border rounded p-1.5 bg-white"><option value="">Loading wards from Ward_No…</option></select>
+                        <label class="text-[11px] text-slate-600">Distribution date</label>
+                        <input type="date" id="edit-schedule-date" class="w-full text-xs border rounded p-1.5 bg-white">
+                        <label class="text-[11px] text-slate-600">Start time</label>
+                        <input type="time" id="edit-schedule-start" value="06:00" class="w-full text-xs border rounded p-1.5 bg-white">
+                        <label class="text-[11px] text-slate-600">End time</label>
+                        <input type="time" id="edit-schedule-end" value="09:00" class="w-full text-xs border rounded p-1.5 bg-white">
+                        <button onclick="saveScheduleTiming()" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs py-1.5 rounded font-medium">Update Schedule Timing</button>
+                    </div>
+
+                    <div id="officer-complaint-section" class="border-t border-slate-200 pt-3 space-y-2 hidden">
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">📋 Manage Citizen Complaints (Officer Only)</h3>
+                        <div class="flex gap-2 text-[11px]"><button onclick="setComplaintFilter('unresolved')" class="border rounded px-2 py-1">Unresolved</button><button onclick="setComplaintFilter('resolved')" class="border rounded px-2 py-1">Resolved</button><button onclick="setComplaintFilter('all')" class="border rounded px-2 py-1">All</button></div>
+                        <div id="officer-complaints-list" class="space-y-2 text-xs"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- GIS Interactive Map Area with Layer Control Button -->
+            <main class="flex-1 relative">
+                <div id="map"></div>
+
+                <!-- Ward search and selection: intentionally no map popup/tooltip -->
+                <div class="absolute top-3 left-3 z-[1000] bg-white/95 border border-slate-200 shadow-md rounded-lg p-2 flex gap-2">
+                    <select id="ward-map-search" aria-label="Find ward" class="text-xs border border-slate-300 rounded-md px-2 py-2 bg-white min-w-36">
+                        <option value="">Find a ward…</option>
+                    </select>
+                    <button type="button" onclick="zoomToSelectedWard()" class="text-xs font-semibold px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white">Find</button>
+                    <button type="button" onclick="clearSelectedWard()" class="text-xs px-2 py-2 rounded-md border border-slate-300 text-slate-700">Clear</button>
+                </div>
+
+                <div class="absolute top-3 right-3 z-[1000]">
+                    <div class="relative">
+                        <button onclick="toggleLayerMenu()" class="bg-white hover:bg-slate-50 text-slate-800 shadow-md border border-slate-300 font-bold text-xs px-3.5 py-2 rounded-lg flex items-center space-x-2 transition">
+                            <span>🗺️ Layers & Basemaps</span>
+                            <span class="text-[10px]">▼</span>
+                        </button>
+
+                        <div id="layer-menu-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 space-y-4 text-xs">
+                            <div>
+                                <h4 class="font-bold text-slate-900 mb-2 uppercase tracking-wider text-[10px]">Basemaps</h4>
+                                <div class="space-y-1.5" id="basemap-options">
+                                    <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="basemap" value="osm" checked onchange="changeBasemap('osm')"> <span>OpenStreetMap (OSM)</span></label>
+                                    <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="basemap" value="streets" onchange="changeBasemap('streets')"> <span>Google Maps (Streets)</span></label>
+                                    <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="basemap" value="satellite" onchange="changeBasemap('satellite')"> <span>Google Satellite</span></label>
+                                    <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="basemap" value="hybrid" onchange="changeBasemap('hybrid')"> <span>Google Hybrid</span></label>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200 pt-3">
+                                <h4 class="font-bold text-slate-900 mb-2 uppercase tracking-wider text-[10px]">Repository Layers</h4>
+                                <div class="space-y-1.5" id="repo-layers-list">
+                                    <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked onchange="toggleRepoLayer('geojson', this.checked)"> <span>Ward_Map.geojson</span></label>
+                                    <div id="storage-layers-list" class="space-y-1.5"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Application Script
+        // Application Script
+        let currentUser = null;
+        let activeWaterWard = null;
+        let extractedWards = [];
+        let isPickingMapLocation = false;
+        let geojsonLayer = null;
+
+        let schedules = [];
+        let complaints = [];
+        let complaintFilter = 'unresolved';
+        let dynamicStorageLayers = [];
+        let dynamicLayerInstances = {};
+
+
+        function switchAuthTab(tab) {
+            if(tab === 'citizen') {
+                document.getElementById('tab-auth-citizen').className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600 text-center font-semibold";
+                document.getElementById('tab-auth-staff').className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 text-center font-semibold";
+                document.getElementById('form-citizen').classList.remove('hidden');
+                document.getElementById('form-staff').classList.add('hidden');
+            } else {
+                document.getElementById('tab-auth-staff').className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600 text-center font-semibold";
+                document.getElementById('tab-auth-citizen').className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 text-center font-semibold";
+                document.getElementById('form-staff').classList.remove('hidden');
+                document.getElementById('form-citizen').classList.add('hidden');
+            }
+        }
+
+        async function loginAsCitizen() {
+            try {
+                const mobile = document.getElementById('citizen-mobile').value.trim();
+                const mobileRegex = /^[6-9]\d{9}$/;
+                
+                if (!mobileRegex.test(mobile)) {
+                    alert("Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.");
+                    return;
+                }
+
+                let { data, error } = await supabase
+                    .from('citizens')
+                    .select('*')
+                    .eq('mobile_number', mobile)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error("Supabase Error:", error);
+                    alert("Database query error: " + error.message);
+                    return;
+                }
+
+                if (!data) {
+                    const { data: insertData, error: insertError } = await supabase
+                        .from('citizens')
+                        .insert([{ mobile_number: mobile, full_name: `Citizen ${mobile}` }])
+                        .select()
+                        .single();
+
+                    if (insertError) {
+                        alert("Error registering citizen: " + insertError.message);
+                        return;
+                    }
+                    data = insertData;
+                }
+
+                currentUser = { role: 'citizen', identifier: `+91 ${mobile}`, ward: null };
+                initSession();
+            } catch (err) {
+                console.error("Exception in citizen login:", err);
+                alert("Citizen login failed. Check console for details.");
+            }
+        }
+
+        async function loginAsStaff() {
+            try {
+                const usernameInput = document.getElementById('staff-username').value.trim();
+                const passwordInput = document.getElementById('staff-password').value.trim();
+
+                if (!usernameInput || !passwordInput) {
+                    alert("Please enter both username/email and password.");
+                    return;
+                }
+
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('email', usernameInput)
+                    .eq('password', passwordInput)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error("Supabase Error:", error);
+                    alert("Database connection error: " + error.message);
+                    return;
+                }
+
+                if (!data) {
+                    alert("Authentication Failed: Invalid username or password.");
+                    return;
+                }
+
+                currentUser = { 
+                    role: data.role, 
+                    identifier: data.full_name, 
+                    ward: data.ward_id !== null && data.ward_id !== undefined ? (normalizeWardNo(data.ward_id) || 'All Wards') : 'All Wards' 
+                };
+                
+                initSession();
+            } catch (err) {
+                console.error("Exception in staff login:", err);
+                alert("Staff login failed. Check console for details.");
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function initSession() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+
+            const badge = document.getElementById('user-session-badge');
+            const mgmtBtn = document.getElementById('btn-tab-management');
+            const opSec = document.getElementById('operator-controls-section');
+            const offSchSec = document.getElementById('officer-schedule-section');
+            const offCompSec = document.getElementById('officer-complaint-section');
+
+            if (currentUser.role === 'citizen') {
+                badge.innerText = `Citizen: ${currentUser.identifier}`;
+                mgmtBtn.classList.add('hidden');
+                document.getElementById('comp-mobile').value = currentUser.identifier;
+                switchTab('map');
+            } else if (currentUser.role === 'valve_operator') {
+                badge.innerText = `Operator: ${currentUser.identifier}`;
+                mgmtBtn.classList.remove('hidden');
+                opSec.classList.remove('hidden');
+                offSchSec.classList.add('hidden');
+                offCompSec.classList.add('hidden');
+                document.getElementById('operator-ward-label').innerHTML = `Assigned Ward: <strong>${currentUser.ward}</strong>`;
+                switchTab('management');
+            } else {
+                badge.innerText = currentUser.role === 'super_admin' ? `Super Admin` : `Water Supply Officer`;
+                mgmtBtn.classList.remove('hidden');
+                opSec.classList.add('hidden');
+                offSchSec.classList.remove('hidden');
+                offCompSec.classList.remove('hidden');
+                switchTab('management');
+            }
+            renderSchedules();
+            renderComplaints();
+            
+            // Load the ward geometry plus database-backed schedules and complaint records.
+            loadGeoJSONData();
+            fetchSchedulesFromSupabase();
+            fetchComplaintsFromSupabase();
+
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 200);
+        }
+
+        const map = L.map('map').setView([18.4088, 76.5604], 14);
+
+        const basemaps = {
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }),
+            streets: L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google Maps' }),
+            satellite: L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google Satellite' }),
+            hybrid: L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google Hybrid' })
+        };
+        basemaps.osm.addTo(map);
+
+        function changeBasemap(type) {
+            Object.values(basemaps).forEach(bm => { if(map.hasLayer(bm)) map.removeLayer(bm); });
+            basemaps[type].addTo(map);
+        }
+
+        function toggleLayerMenu() {
+            document.getElementById('layer-menu-dropdown').classList.toggle('hidden');
+        }
+
+        // Ward boundaries and the canonical ward list are sourced from Supabase Storage.
+        const WARD_STORAGE_BUCKET = 'gis-data';
+        const WARD_STORAGE_FILE = 'Ward_Map.geojson';
+        let wardFeatureCollection = null;
+        let selectedWardName = null;
+
+        function normalizeWardNo(value) {
+            if (value === null || value === undefined || String(value).trim() === '') return null;
+            const raw = String(value).trim();
+            if (/^\d+$/.test(raw)) return `Ward ${raw.padStart(2, '0')}`;
+            return `Ward ${raw}`;
+        }
+
+        function wardNumberFromName(name) {
+            const match = String(name || '').match(/^Ward\\s+(.+)$/i);
+            return match ? match[1].trim() : String(name || '').trim();
+        }
+
+        function sortWardNames(a, b) {
+            const na = Number(wardNumberFromName(a));
+            const nb = Number(wardNumberFromName(b));
+            if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+            return String(a).localeCompare(String(b), undefined, { numeric: true });
+        }
+
+        async function loadGeoJSONData() {
+            try {
+                // download() supports private buckets for signed-in users with Storage policies,
+                // and public buckets as well. Never assume getPublicUrl grants access.
+                const { data: file, error } = await supabase.storage
+                    .from(WARD_STORAGE_BUCKET)
+                    .download(WARD_STORAGE_FILE);
+
+                if (error) throw error;
+                if (!file) throw new Error('Storage returned an empty file.');
+
+                const data = JSON.parse(await file.text());
+                if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) {
+                    throw new Error('Ward_Map.geojson is not a valid GeoJSON FeatureCollection.');
+                }
+
+                wardFeatureCollection = data;
+                const uniqueWards = new Set();
+
+                data.features.forEach(feature => {
+                    const ward = normalizeWardNo(feature?.properties?.Ward_No);
+                    if (ward) uniqueWards.add(ward);
+                });
+
+                extractedWards = Array.from(uniqueWards).sort(sortWardNames);
+                if (!extractedWards.length) {
+                    throw new Error('No values found in the GeoJSON Ward_No field.');
+                }
+
+                populateWardDropdowns();
+                populateWardMapSearch();
+                loadStorageGeoJSONLayers();
+
+                if (geojsonLayer) map.removeLayer(geojsonLayer);
+                geojsonLayer = L.geoJSON(data, {
+                    style: function(feature) {
+                        const p = feature.properties || {};
+                        const wardName = normalizeWardNo(p.Ward_No);
+                        const isActive = activeWaterWard &&
+                            normalizeWardNo(wardName) === normalizeWardNo(activeWaterWard);
+                        const isSelected = selectedWardName && wardName === selectedWardName;
+                        return {
+                            color: isSelected ? '#2563eb' : (isActive ? '#10b981' : (p.status === 'Upcoming' ? '#f59e0b' : '#0f172a')),
+                            weight: isSelected ? 4 : (isActive ? 3 : 1.5),
+                            fillColor: isSelected ? '#60a5fa' : '#3b82f6',
+                            fillOpacity: isSelected ? 0.28 : 0.10
+                        };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        const p = feature.properties || {};
+                        const wardName = normalizeWardNo(p.Ward_No);
+
+                        layer.on('click', function(e) {
+                            if (isPickingMapLocation) {
+                                document.getElementById('comp-coords').value =
+                                    `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+                                isPickingMapLocation = false;
+                                return;
+                            }
+                            selectWardOnMap(wardName, layer);
+                        });
+                    }
+                }).addTo(map);
+
+                if (geojsonLayer.getBounds().isValid()) {
+                    map.fitBounds(geojsonLayer.getBounds(), { padding: [20, 20] });
+                }
+
+                // Keep schedule/operator ward references aligned to the canonical GeoJSON list.
+                schedules = schedules.filter(item => extractedWards.includes(normalizeWardNo(item.ward)));
+                complaints = complaints.filter(item => !item.ward || extractedWards.includes(normalizeWardNo(item.ward)));
+                renderSchedules();
+                renderComplaints();
+
+                document.dispatchEvent(new CustomEvent('ward-data-loaded', {
+                    detail: { wards: [...extractedWards], geojson: wardFeatureCollection }
+                }));
+            } catch (error) {
+                console.error('Could not load ward GeoJSON from Supabase Storage:', error);
+                const details = document.getElementById('asset-details-box');
+                if (details) {
+                    details.textContent = `Ward map could not be loaded from Supabase Storage: ${error.message}`;
+                }
+            }
+        }
+
+        function selectWardOnMap(wardName, clickedLayer = null) {
+            if (!wardName) return;
+            selectedWardName = wardName;
+            if (geojsonLayer) {
+                geojsonLayer.eachLayer(function(wardLayer) {
+                    const props = wardLayer.feature?.properties || {};
+                    const thisWard = normalizeWardNo(props.Ward_No);
+                    const selected = thisWard === selectedWardName;
+                    const active = activeWaterWard && thisWard === normalizeWardNo(activeWaterWard);
+                    wardLayer.setStyle({
+                        color: selected ? '#2563eb' : (active ? '#10b981' : (props.status === 'Upcoming' ? '#f59e0b' : '#0f172a')),
+                        weight: selected ? 4 : (active ? 3 : 1.5),
+                        fillColor: selected ? '#60a5fa' : '#3b82f6',
+                        fillOpacity: selected ? 0.28 : 0.10
+                    });
+                });
+            }
+            const search = document.getElementById('ward-map-search');
+            if (search) search.value = wardName;
+            const details = document.getElementById('asset-details-box');
+            if (details) {
+                const schedule = schedules.find(item => normalizeWardNo(item.ward) === wardName);
+                details.innerHTML = `<div class="font-bold text-slate-800">${wardName}</div><div class="mt-1">Distribution: <strong>${activeWaterWard && normalizeWardNo(activeWaterWard) === wardName ? 'In progress' : (schedule ? 'Scheduled' : 'No schedule listed')}</strong></div>${schedule ? `<div class="mt-1">Schedule: ${schedule.timing || schedule.date || 'See schedule tab'}</div>` : ''}`;
+            }
+        }
+
+        function populateWardMapSearch() {
+            const select = document.getElementById('ward-map-search');
+            if (!select) return;
+            const previous = select.value;
+            select.replaceChildren();
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'Find a ward…';
+            select.appendChild(placeholder);
+            extractedWards.forEach(ward => {
+                const option = document.createElement('option');
+                option.value = ward;
+                option.textContent = ward;
+                select.appendChild(option);
+            });
+            if (extractedWards.includes(previous)) select.value = previous;
+        }
+
+        function zoomToSelectedWard() {
+            const wardName = document.getElementById('ward-map-search')?.value;
+            if (!wardName || !geojsonLayer) return;
+            let found = null;
+            geojsonLayer.eachLayer(layer => {
+                if (normalizeWardNo(layer.feature?.properties?.Ward_No) === wardName) found = layer;
+            });
+            if (found) {
+                if (found.getBounds && found.getBounds().isValid()) map.fitBounds(found.getBounds(), { padding: [30, 30], maxZoom: 17 });
+                selectWardOnMap(wardName, found);
+            }
+        }
+
+        function clearSelectedWard() {
+            selectedWardName = null;
+            const search = document.getElementById('ward-map-search');
+            if (search) search.value = '';
+            const details = document.getElementById('asset-details-box');
+            if (details) details.innerHTML = '<span class="italic text-slate-400">Select a ward on the map or use Find a ward.</span>';
+            if (geojsonLayer) {
+                geojsonLayer.eachLayer(layer => {
+                    const props = layer.feature?.properties || {};
+                    const active = activeWaterWard && normalizeWardNo(props.Ward_No) === normalizeWardNo(activeWaterWard);
+                    layer.setStyle({ color: active ? '#10b981' : (props.status === 'Upcoming' ? '#f59e0b' : '#0f172a'), weight: active ? 3 : 1.5, fillColor: '#3b82f6', fillOpacity: 0.10 });
+                });
+            }
+        }
+
+        function populateWardDropdowns() {
+            // All ward-based controls must be populated from this shared Ward_No list.
+            const selectors = ['comp-ward-select', 'edit-schedule-idx', 'ward-map-search'];
+            selectors.forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+
+                const previousValue = select.value;
+                select.replaceChildren();
+
+                extractedWards.forEach(ward => {
+                    const option = document.createElement('option');
+                    option.value = ward;
+                    option.textContent = ward;
+                    select.appendChild(option);
+                });
+
+                if (extractedWards.includes(previousValue)) select.value = previousValue;
+            });
+        }
+
+        async function loadStorageGeoJSONLayers() {
+            const panel = document.getElementById('storage-layers-list');
+            if (!panel) return;
+            const { data, error } = await supabase.storage.from(WARD_STORAGE_BUCKET).list('', { limit: 1000 });
+            if (error) { console.warn('Could not list GIS bucket objects:', error.message); return; }
+            dynamicStorageLayers = (data || []).filter(item => /\.geojson$/i.test(item.name) && item.name !== WARD_STORAGE_FILE);
+            panel.innerHTML = dynamicStorageLayers.map((item, index) => `<label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-storage-layer-index="${index}"><span>${item.name}</span></label>`).join('');
+            panel.querySelectorAll('[data-storage-layer-index]').forEach(input => input.addEventListener('change', () => toggleStorageGeoJSONLayer(dynamicStorageLayers[Number(input.dataset.storageLayerIndex)].name, input.checked)));
+        }
+
+        async function toggleStorageGeoJSONLayer(fileName, show) {
+            if (!show) {
+                if (dynamicLayerInstances[fileName]) map.removeLayer(dynamicLayerInstances[fileName]);
+                return;
+            }
+            if (dynamicLayerInstances[fileName]) { dynamicLayerInstances[fileName].addTo(map); return; }
+            const { data, error } = await supabase.storage.from(WARD_STORAGE_BUCKET).download(fileName);
+            if (error) { alert(`Could not load ${fileName}: ${error.message}`); return; }
+            try {
+                const geojson = JSON.parse(await data.text());
+                const layer = L.geoJSON(geojson, { style: { color: '#7c3aed', weight: 2, fillOpacity: 0.12 } });
+                dynamicLayerInstances[fileName] = layer;
+                layer.addTo(map);
+            } catch (e) { alert(`${fileName} is not valid GeoJSON.`); }
+        }
+
+        function toggleRepoLayer(layerName, show) {
+            if(layerName === 'geojson' && geojsonLayer) {
+                if(show) geojsonLayer.addTo(map);
+                else map.removeLayer(geojsonLayer);
+            }
+        }
+
+        function triggerAssignedWaterFlow() {
+            if(!currentUser || currentUser.role !== 'valve_operator') return;
+            activeWaterWard = currentUser.ward;
+            loadGeoJSONData();
+            document.getElementById('live-alert-banner').classList.remove('hidden');
+            document.getElementById('alert-msg').innerText = `🟢 WATER FLOW STARTED for ${currentUser.ward}!`;
+        }
+
+        function stopWaterFlow() {
+            activeWaterWard = null;
+            loadGeoJSONData();
+            document.getElementById('live-alert-banner').classList.remove('hidden');
+            document.getElementById('alert-msg').innerText = `⚫ Water distribution ended. Reset to standby.`;
+        }
+
+        function fetchLiveLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('comp-coords').value = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                    alert("GPS location fetched!");
+                }, () => alert("Permission denied or unavailable."));
+            }
+        }
+
+        function enableMapPinSelection() {
+            isPickingMapLocation = true;
+            alert("Click anywhere on the map to pin location.");
+        }
+
+        function localDateISO() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        async function fetchSchedulesFromSupabase() {
+            const { data, error } = await supabase.from('distribution_schedules')
+                .select('id,ward_no,service_date,planned_start,planned_end,status,remarks')
+                .order('service_date', { ascending: true });
+            if (error) { console.error('Schedule fetch:', error); return; }
+            schedules = (data || []).map(row => ({
+                id: row.id, ward: normalizeWardNo(row.ward_no), date: row.service_date,
+                time: `${String(row.planned_start || '').slice(0,5)} - ${String(row.planned_end || '').slice(0,5)} IST`,
+                status: row.status || 'published', remarks: row.remarks || ''
+            }));
+            renderSchedules();
+        }
+
+        async function fetchComplaintsFromSupabase() {
+            const { data, error } = await supabase.from('complaints')
+                .select('id,reference_no,mobile_number,ward_no,complaint_type,description,status,officer_remark,latitude,longitude,created_at')
+                .order('created_at', { ascending: false });
+            if (error) { console.error('Complaint fetch:', error); return; }
+            complaints = (data || []).map(row => ({
+                id: row.reference_no || row.id, dbid: row.id, mobile: row.mobile_number,
+                ward: normalizeWardNo(row.ward_no), type: row.complaint_type, desc: row.description,
+                status: row.status || 'Submitted', remark: row.officer_remark || '',
+                coords: row.latitude != null ? `${row.latitude}, ${row.longitude}` : ''
+            }));
+            renderComplaints(); renderOfficerComplaints();
+        }
+
+        async function saveScheduleTiming() {
+            if (!currentUser || !['officer','admin','superadmin','sanitation_officer'].includes(currentUser.role)) {
+                alert('Officer or administrator access required.'); return;
+            }
+            const ward = document.getElementById('edit-schedule-idx').value;
+            const date = document.getElementById('edit-schedule-date').value || localDateISO();
+            const start = document.getElementById('edit-schedule-start').value;
+            const end = document.getElementById('edit-schedule-end').value;
+            if (!ward || !extractedWards.includes(ward) || !start || !end || end <= start) {
+                alert('Choose a valid GeoJSON ward and a valid start/end time.'); return;
+            }
+            const wardNo = wardNumberFromName(ward);
+            const { data: existing, error: findError } = await supabase.from('distribution_schedules')
+                .select('id').eq('ward_no', wardNo).eq('service_date', date).maybeSingle();
+            if (findError) { alert('Could not check existing schedule: ' + findError.message); return; }
+            const record = { schedule_code: `WARD-${wardNo}-${date}`, ward_no: wardNo, zone_asset_id: null,
+                service_date: date, planned_start: start, planned_end: end, status: 'published',
+                created_by: currentUser.id, remarks: 'Published from portal' };
+            const request = existing
+                ? supabase.from('distribution_schedules').update(record).eq('id', existing.id)
+                : supabase.from('distribution_schedules').insert(record);
+            const { error } = await request;
+            if (error) { alert('Could not save schedule: ' + error.message); return; }
+            await fetchSchedulesFromSupabase();
+            alert('Schedule saved to Supabase and published to citizens.');
+        }
+
+        async function setComplaintStatus(dbid, status) {
+            const { error } = await supabase.from('complaints').update({ status, updated_at: new Date().toISOString() }).eq('id', dbid);
+            if (error) { alert('Could not update complaint: ' + error.message); return; }
+            await fetchComplaintsFromSupabase();
+        }
+
+        function setComplaintFilter(filter) { complaintFilter = filter; renderOfficerComplaints(); }
+
+        function renderOfficerComplaints() {
+            const container = document.getElementById('officer-complaints-list');
+            if (!container) return;
+            const list = complaints.filter(c => complaintFilter === 'all' ||
+                (complaintFilter === 'resolved' ? ['resolved','closed'].includes(String(c.status).toLowerCase()) : !['resolved','closed'].includes(String(c.status).toLowerCase())));
+            container.innerHTML = list.map(c => `<div class="border rounded p-2 space-y-1"><div class="font-bold">${c.ward || 'Ward unavailable'} · ${c.id}</div><div>${c.type || ''}: ${c.desc || ''}</div><div class="text-slate-500">Status: ${c.status}</div>${c.dbid ? `<div class="flex gap-1"><button onclick="setComplaintStatus('${c.dbid}','In Progress')" class="border rounded px-2 py-1">In progress</button><button onclick="setComplaintStatus('${c.dbid}','Resolved')" class="bg-emerald-600 text-white rounded px-2 py-1">Resolve</button></div>` : ''}</div>`).join('') || '<p class="text-slate-500">No complaints in this view.</p>';
+        }
+
+        async function submitComplaint() {
+            const mobile = document.getElementById('comp-mobile').value;
+            const ward = document.getElementById('comp-ward-select').value;
+            if (!ward || !extractedWards.includes(ward)) { alert('Please select a valid ward loaded from Ward_No.'); return; }
+            const type = document.getElementById('comp-type').value;
+            const coords = document.getElementById('comp-coords').value;
+            const desc = document.getElementById('comp-desc').value.trim();
+            if (!desc) { alert('Please describe the complaint.'); return; }
+            const parts = coords.split(',').map(v => Number(v.trim()));
+            const hasCoords = parts.length === 2 && parts.every(Number.isFinite);
+            const ref = `LATUR-WTR-${Date.now().toString().slice(-8)}`;
+            const payload = { reference_no: ref, mobile_number: mobile, ward_no: wardNumberFromName(ward), complaint_type: type,
+                description: desc, status: 'Unresolved', latitude: hasCoords ? parts[0] : null, longitude: hasCoords ? parts[1] : null };
+            const { error } = await supabase.from('complaints').insert(payload);
+            if (error) { alert('Complaint was not saved to Supabase: ' + error.message); return; }
+            document.getElementById('comp-receipt').classList.remove('hidden');
+            document.getElementById('comp-receipt').textContent = `Registered in Supabase. Reference: ${ref}`;
+            document.getElementById('comp-desc').value = '';
+            await fetchComplaintsFromSupabase();
+        }
+
+        function renderSchedules() {
+            const target = document.getElementById('public-schedules-container');
+            if (!target) return;
+            target.innerHTML = schedules.map(s => `
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs space-y-1">
+                    <div class="font-bold text-slate-900">${s.ward}</div>
+                    <div class="text-slate-600">Date: ${s.date || 'Not specified'}</div>
+                    <div class="text-slate-600">Timing: ${s.time}</div>
+                    <div class="text-slate-600">Status: ${s.status || 'Published'}</div>
+                </div>`).join('') || '<p class="text-xs text-slate-500">No published distribution schedules are available.</p>';
+        }
+
+        function renderComplaints() {
+            const target = document.getElementById('citizen-complaints-list');
+            if (!target) return;
+            const unresolved = complaints.filter(c => !['resolved','closed'].includes(String(c.status).toLowerCase()));
+            const resolved = complaints.filter(c => ['resolved','closed'].includes(String(c.status).toLowerCase()));
+            target.innerHTML = `<div class="font-bold text-amber-700">Unresolved (${unresolved.length})</div>` + unresolved.map(c => complaintCard(c)).join('') +
+                `<div class="font-bold text-emerald-700 mt-3">Resolved (${resolved.length})</div>` + resolved.map(c => complaintCard(c)).join('');
+        }
+        function complaintCard(c) {
+            return `<div class="bg-slate-50 border border-slate-200 rounded p-2 space-y-1"><div class="flex justify-between font-bold"><span>${c.ward || ''}</span><span class="text-[10px] text-slate-500">${c.id}</span></div><p class="text-slate-600 text-[11px]">${c.type || ''}: ${c.desc || ''}</p><p class="text-[11px]">Status: ${c.status || 'Unresolved'}</p></div>`;
+        }
+
+        function switchTab(tab) {
+            ['map', 'schedules', 'complaints', 'management'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-tab-${t}`).className = "flex-1 py-1.5 text-xs font-semibold rounded bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition";
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-tab-${tab}`).className = "flex-1 py-1.5 text-xs font-semibold rounded bg-blue-600 text-white transition shadow-xs";
+            setTimeout(() => map.invalidateSize(), 150);
+        }
+    </script>
+</body>
+</html>

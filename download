@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+*.sql.bak
+*.dump
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
